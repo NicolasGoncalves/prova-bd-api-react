@@ -1,6 +1,7 @@
 
 import {Router} from 'express'
-import { InseriFilmes , alterarImagem } from '../repository/filmeRepository.js';
+
+import { InseriFilmes , alterarImagem ,listarTodosFilmes,buscarPorId } from '../repository/filmeRepository.js';
 
 import multer from 'multer'
 
@@ -67,5 +68,57 @@ server.put("/filme/:id/capa",upload.single('capa'), async(req,resp)=>{
         })
     }
 })
+
+server.get('/filmes', async (req, resp) => {
+    try {
+        const resposta = await listarTodosFilmes();
+        resp.send(resposta);
+
+    } 
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        })
+    }
+})
+
+server.get('/filmes/busca', async (req, resp) => {
+    try {
+        const {nome} = req.query ;
+
+        const resposta = await buscarPorNome(nome);
+  
+        if (resposta.length == 0) {
+            throw new Error('vc tá maluco meu?')
+        }
+
+        resp.send(resposta);
+    } 
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message 
+        })
+    }
+})
+
+server.get('/filmes/:id', async (req, resp) => {
+    try {
+        const id = Number ( req.params.id );
+
+        const resposta = await buscarPorId(id);
+  
+        if (!resposta) {
+            throw new Error('vc tá maluco meu?')
+        }
+
+        resp.send(resposta);
+    } 
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        })
+    }
+})
+
 
 export default server;
