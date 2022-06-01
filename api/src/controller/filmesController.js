@@ -1,7 +1,7 @@
 
 import {Router} from 'express'
 
-import { InseriFilmes , alterarImagem ,listarTodosFilmes,buscarPorId } from '../repository/filmeRepository.js';
+import { InseriFilmes , alterarImagem ,listarTodosFilmes,buscarPorNome,buscarPorId,removerFilme,alterarFilme } from '../repository/filmeRepository.js';
 
 import multer from 'multer'
 
@@ -120,5 +120,69 @@ server.get('/filmes/:id', async (req, resp) => {
     }
 })
 
+server.delete('/filmes/:id', async (req, resp) => {
+    try {
+        const { id } =req.params;
+
+        const resposta = await removerFilme(id);
+
+        if (resposta != 1) {
+            throw new Error ('Filme não pode ser removido')
+        }
+
+        resp.status(204).send();
+    } 
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message 
+        })
+    }
+})
+
+server.put('/filmes/:id', async (req,resp) => {
+    try {
+        const { id } = req.params;
+        const filme = req.body;
+
+        if (!filme.nome) {
+            throw new Error('Nome do filme é obrigatorio!');
+        }
+
+        if (!filme.sinopse) {
+            throw new Error('Sinopse do filme é obrigatorio!');
+        }
+
+        if(filme.avaliacao == undefined || filme.avaliacao < 0){
+          throw new Error ('Avaliação do filme é obrigatorio!')
+        }
+
+        if (!filme.lancamento) {
+            throw new Error('Lancamento do filme é obrigatorio!');
+        }
+
+        if (!filme.disponivel) {
+            throw new Error('Campo Disponivel é obrigatorio!');
+        }
+
+        if (!filme.usuario) {
+            throw new Error('Usuário não logado!');
+        }
+        
+
+        const resposta = await alterarFilme(id, filme);
+        if (resposta != 1) {
+            throw new Error ('BURRO PARACE UMA MULA');
+            
+        }
+        else{
+            resp.status(205).send();
+        }
+    } 
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message 
+        })
+    }
+})
 
 export default server;
