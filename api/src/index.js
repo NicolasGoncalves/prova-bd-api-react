@@ -10,6 +10,8 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
+server.use('/storage/capaFilmes', express.static('storage/capaFilmes'));
+
 // endpoints 
 server.use(usuarioController);
 server.use(filmeController);
